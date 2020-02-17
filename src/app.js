@@ -1,8 +1,10 @@
+import 'dotenv/config';
 import express, { json } from 'express';
 import Youch from 'youch';
 import 'express-async-errors';
 
 import routes from './routes';
+import './database';
 
 class App {
   constructor() {
@@ -15,7 +17,6 @@ class App {
   middlewares() {
     // Difining the application to receive jsons
     this.server.use(json());
-    this.server.use('/files');
   }
 
   routes() {
@@ -25,7 +26,7 @@ class App {
   exceptionHandler() {
     this.server.use(async (err, req, res, next) => {
       // Only show error details into development
-      if (process.env === 'development') {
+      if (process.env.NODE_ENV === 'development') {
         const errors = await new Youch(err, req).toJSON();
         return res.status(500).json(errors);
       }

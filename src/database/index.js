@@ -1,3 +1,25 @@
 import Sequelize from 'sequelize';
 
-import databaseConfig from '../config/databse';
+import User from '../app/models/User';
+import Recipient from '../app/models/Recipient';
+
+import databaseConfig from '../config/database';
+
+const models = [User, Recipient];
+
+class Database {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    this.connection = new Sequelize(databaseConfig);
+    // Iterating into all modules and make the initializations
+    models.map(model => model.init(this.connection));
+    models.map(
+      model => model.associate && model.associate(this.connection.models)
+    );
+  }
+}
+
+export default new Database();
