@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
-import User from '../models/User';
+
+import UserService from '../services/UserService';
 
 class UserController {
   async store(req, res) {
@@ -17,18 +18,13 @@ class UserController {
       return res.status(400).json({ error: 'schama is not valid' });
     }
 
-    const userAlreadyExists = await User.findOne({
-      where: { email: req.body.email }
-    });
+    const savedUser = await UserService.save(req, res);
 
-    if (userAlreadyExists) {
-      return res
-        .status(400)
-        .json({ error: 'A User with this email already exists' });
+    const { id, name, email, provider } = savedUser;
+    if (id) {
+      return res.json({ id, name, email, provider });
     }
-
-    const { id, name, email, provider } = await User.create(req.body);
-    return res.json({ id, name, email, provider });
+    return null;
   }
 }
 

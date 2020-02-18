@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { promisify } from 'util';
 import authConfig from '../../config/auth';
+import User from '../models/User';
+import Role from '../models/Role';
 
 export default async (req, res, next) => {
   // Verifiying if the autorization is informed by the client
@@ -15,8 +17,24 @@ export default async (req, res, next) => {
     // O promisify transforma uma função de callback em uma promise
     // por isso existe um segundo (apóś a função)
     const decoded = await promisify(jwt.verify)(token, authConfig.secret);
-    // Incluindo o userId na requisição depois de logado
+    // Including the userId in the request after the login
     req.userId = decoded.id;
+    // Finding the user Roles and add them to the request
+    const user = await User.findByPk(req.userId, {
+      include: [
+        {
+          model: Role,
+          as: 'roles',
+          attributes: ['role']
+        }
+      ]
+    });
+    const requestRoles = [];
+    const userRoles = user.roles;
+    userRoles.forEach(userRole => {
+      requestRoles.push(userRole.role);
+    });
+    req.roles = requestRoles;
     return next();
   } catch (err) {
     return res.status(401).json({ error: 'invalid token' });
