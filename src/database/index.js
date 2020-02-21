@@ -6,10 +6,11 @@ import Role from '../app/models/Role';
 import Order from '../app/models/Order';
 import Courier from '../app/models/Courier';
 import File from '../app/models/File';
+import OrderProblem from '../app/models/OrderProblem';
 
 import databaseConfig from '../config/database';
 
-const models = [User, Recipient, Role, Order, Courier, File];
+const models = [User, Recipient, Role, Order, Courier, File, OrderProblem];
 
 class Database {
   constructor() {

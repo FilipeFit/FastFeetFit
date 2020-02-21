@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import AuthorizationService from '../services/AuthorizationService';
 
 import UserService from '../services/UserService';
 
@@ -13,7 +14,7 @@ class UserController {
         .required()
         .min(6)
     });
-
+    AuthorizationService.authorize(req, ['admin']);
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'schama is not valid' });
     }

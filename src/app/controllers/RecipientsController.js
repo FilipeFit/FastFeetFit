@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import Recipient from '../models/Recipient';
+import AuthorizationService from '../services/AuthorizationService';
 
 class RecipientsController {
   async store(req, res) {
@@ -14,6 +15,11 @@ class RecipientsController {
       city: Yup.string().required(),
       cep: Yup.string().required()
     });
+    if (!AuthorizationService.authorize(req, ['admin'])) {
+      return res
+        .status(401)
+        .json("You don't have permitions to use this service");
+    }
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'schama is not valid' });
@@ -55,6 +61,11 @@ class RecipientsController {
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'schama is not valid' });
+    }
+    if (!AuthorizationService.authorize(req, ['admin'])) {
+      return res
+        .status(401)
+        .json("You don't have permitions to use this service");
     }
 
     const { name } = req.body;

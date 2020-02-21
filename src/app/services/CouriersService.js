@@ -31,19 +31,28 @@ class CouriersService {
   }
 
   async delete(req, res) {
-    const isCourirHaveOrders = Order.findOne({
+    const isCourierExists = await Courier.findByPk(req.params.id);
+    if (!isCourierExists) {
+      res.status(400).json({
+        error: "Courier don't exists"
+      });
+    }
+    const isCourirHaveOrders = await Order.findOne({
       where: {
         courier_id: req.params.id
       }
     });
     if (isCourirHaveOrders) {
       res.status(400).json({
-        error: 'This Courier Already have a order impossible to delete '
+        error: 'This Courier Already have a order impossible to delete'
       });
     }
-    const courier = Courier.findByPk(req.params.id);
-    courier.delete();
-    return res.status(204);
+    // const courier = await Courier.findByPk(req.params.id);
+    return !!(await Courier.destroy({
+      where: {
+        id: req.params.id
+      }
+    }));
   }
 
   async index() {
